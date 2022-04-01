@@ -2,6 +2,12 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.0.
 
+# Feactures
+
+Consumo de servicios REST y uso de MAP para mapear a los models segun la estructura del JSON
+Creación de formularios con binding ngModel y validaciones del lado del HTML
+Creación de formularios Reactivos con binding y validaciones desde el componente
+
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
