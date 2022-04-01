@@ -1,0 +1,31 @@
+1. isntalar node JS
+	https://nodejs.org/es/
+
+2. Instalar TypeScript de manera Global
+	npm install -g typescript
+
+3. instalar Angular
+	npm install -g @angular/cli
+
+4. validamos la version de angular/cli instalada
+	ng version
+	
+5. Validar CLI commands en la documentación
+	https://angular.io/cli
+	
+6. isntalar Atom|VSCode
+	https://atom.io/
+	https://code.visualstudio.com/download
+	
+7. Installar plugins en Atom
+	Angular-snipets
+	Atom-Typescript
+	AtomBootstrap3 y 4
+	v-bootstrap 4
+	platformio (Terminal)
+	file-icons
+	emmet (herramientas para developers)
+	minimap (mapa del codigo - opcional)
+	
+8. 
+

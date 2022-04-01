@@ -1,0 +1,678 @@
+Creando un proyecto en angular
+	comando ng new nombreaplicacion-app
+
+1. ng new clientes-app
+	No Routing
+	CSS x default
+
+INSTALAR BOOTSTRAP - JQUERY - POPPER (Tooltips)
+ npm install bootstrap jquery @popperjs/core
+
+2. Abrir el proyecto en VSCode
+
+3. Adicionar al archivo angular Json en el Style y Scripts node las siguientes instrucciones
+
+	"styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles.css"
+            ],
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/@popperjs/core/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
+	
+3. ejecutar el proyecto
+	ng serve --o 
+	
+
+GENERAR EL MODULO DE RUTAS
+1. crear un archivo routes en la ruta principal del proyecto con las rutas de la aplicación}
+
+	import { RouterModule, Routes } from "@angular/router";
+	import { LoginComponent } from "./login/login.component";
+
+	const ROUTES: Routes = [
+	  {path: '', redirectTo: '/login', pathMatch: 'full'},
+	  {path: 'login', component: LoginComponent}
+	]
+
+	export const APP_ROUTING = RouterModule.forRoot(ROUTES);
+	
+2. importar el arvhivo de rutas al app en la sección de imports teniendo en cuenta la variable export definida en el archivo de rutas
+	imports: [
+		BrowserModule,
+		APP_ROUTING
+	  ],
+	
+3. Adicionar al app.component.html la directiva router-outlet para que las rutas funcionen
+	<div class="container" >
+	  <router-outlet></router-outlet>
+	</div>
+	
+
+ADICIONANDO HEADER Y FOOTER A LA PLANTILLA
+
+GENERAR EL COMPONENTE FOOTER
+1. ng g c footer
+
+2. Editar el header.component.html con el diseño deseado
+
+3. Adicionarlo a la pagina principal app.component. html
+	<div class="container" >
+	  <router-outlet></router-outlet>
+	</div>
+	<app-footer></app-footer>
+
+GENERAR EL COMPONENTE HEADER
+1. ng g c header
+
+2. Editar el header.component.html con el diseño deseado
+
+3. Adicionarlo a la pagina principal app.component.html
+	
+
+GENERAR EL COMPONENTE FOOTER
+1. ng g c footer
+
+2. Editar el header.component.html con el diseño deseado
+	<app-header></app-header>
+	<div class="container" >
+	  <router-outlet></router-outlet>
+	</div>
+	<app-footer></app-footer>
+	
+DEFINIR VARIABLES DE ENTORNO 
+Adicionamos el host al que se debe conectar el front con el back en el archivo de environments
+	export const environment = {
+	  production: false,
+	  host: "https://demo9952806.mockable.io"
+	};
+	
+
+5. Generar una clase  en Angular
+ng g class cliente
+
+6. De los datos recibidos desde el back se pueden convertir en observables que son Asincronicos
+	Si los datos sufren cambios en el servidor tienen la capacidad de actualizarse en tiempo real
+	
+	en el service se debe tener de la siguiente manera
+	
+	getClientes() : Observable<Cliente[]>{
+		return of(CLIENTES);
+	}
+	
+	en el componente seria de la siguiente forma
+	
+	ngOnInit(): void {
+    this.clienteService.getClientes(). subscribe(
+      clientes => this.clientes = clientes
+    );
+  }
+  
+  o con la funcion anonima extendida
+  
+  ngOnInit(): void {
+    this.clienteService.getClientes(). subscribe(
+      function (clientes){
+        this.clientes = clientes
+      }
+    );
+  }
+  
+IMPLEMENTANDO RUTAS
+1. en el appModulde se debe Importar el RouterModule, Routes from @angular/router
+  
+2. Definir una constante que tiene el arreglo con las rutas
+	const routes : Routes = [
+		{path: '', redirectTo: '/clientes', pathMatch: 'full'},   // Home - Redirige a clientes y pathmatchFull que haga un match completo con la URL
+		{path: 'directivas', component: DirectivaComponent},
+		{path: 'clientes', component: ClientesComponent}   //nombre de la ruta (url) y componente que se debe cargar
+	];
+	
+3. Registrar en los import las rutas utilizando el routerModule de la siguiente manera
+	imports: [
+		BrowserModule,
+		RouterModule.forRoot(routes)
+	]
+
+4. En el componente principal de la aplicación "app.component.html" se coloca una directiva para la carga de las rutas
+	<div class="container">
+		<router-outlet></router-outlet>
+	</div>
+	
+	indica donde se va a renderizar el contenido de cada ruta que se tiene
+	
+5. Modificar el el componete Header (o menú)  de la aplicación para adicionar los links que tenemos en routes
+	
+	Cada opción de menu debe tener
+	* router link con la ruta (url) que va a cargar
+	* routertLinkActive para indicar de manera visual el la opción que esta activa
+	
+	<li class="nav-item">
+      <a class="nav-link" aria-current="page" href="#">Home</a>
+    </li>
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" aria-current="page" routerLink="/directivas">Directivas</a>
+    </li>
+    <li class="nav-item" routerLinkActive="active">
+      <a class="nav-link" aria-current="page" routerLink="/clientes">Clientes</a>
+    </li>
+	
+INTEGRANDO EL FRONT CON EL BACK
+
+1. Se importa el objeto HttpClientModule en el appModule del proyecto
+	import { HttpClientModule } from '@angular/common/http';
+
+2. Se adiciona a los imports de appModule
+	imports: [
+		BrowserModule,
+		RouterModule.forRoot(ROUTES),
+		HttpClientModule
+	  ],
+	  
+3. En la clase service se injecta el protocolo Http en el constructor
+	constructor(private http: HttpClient) { }
+	
+4. Se declara una variabla para la URL del servicio
+	private urlEndPoint = "https://demo9952806.mockable.io/clientes";
+	
+5. Se modifica el metodo getClientes para que llame al servicio casteando a tipo map
+	getClientes() : Observable<Cliente[]>{
+		return this.http.get<Cliente[]>(this.urlEndPoint);
+	}
+	
+	o tambien se puede hacer con un map
+	1. importando map de rxjs
+		import { map } from 'rxjs';
+		
+	2. Ajusta la funcion para utilizar el metodo MAP
+	
+	getClientesConMap() : Observable<Cliente[]>{
+		return this.http.get(this.urlEndPoint).pipe(
+		  map( response => response as Cliente[])
+		);
+	}
+
+CREANDO EL FORMULARIO DE CLIENTES
+1. Creamos el componente Form 
+	ng g c clientes/form --flat
+	
+2. En appModule importamos el objeto FormsModule
+	imports: [
+		BrowserModule,
+		RouterModule.forRoot(ROUTES),
+		HttpClientModule,
+		FormsModule
+	  ]
+	  
+3. Creamos el formulario en el form.component.html
+	
+4. Se crea en el form.component una variable de tipo Cliente para que e ngModel haga el binding con las propiedades del objeto
+	
+	export class FormComponent implements OnInit {	
+		cliente: Cliente = new Cliente();
+		
+5. Crear el boton para enviar el formulario al back
+	<div class="form-group row">
+        <div class="col-sm-6">
+          <button class="btn btn-primary" role="button">Crear</button>
+        </div>
+      </div>
+	  
+6. Se da la funcionlidad de submit al formulario
+	<form (ngSubmit)="create()">
+	
+7. Se crea el meodo create en el form.component
+	create(): void{
+		console.log("Clicked");
+		console.log(this.cliente);
+	  }
+	  
+Adicionando las rutas del nuevo formulario
+
+1. SE adiciona al appmodules la ruta nueva
+	{path: 'clientes/form', component: FormComponent}
+	
+2. Adicionarl el link al html de clientes
+	<div class="my-2 text-left">
+      <button type="button" class="btn btn-primary" [routerLink]="['/clientes/form']">Crear cliente</button>
+    </div>
+
+IMPLEMENTAMOS EL METODO CREAR EN EL SERVICIO DE CLIENTES
+1. Declarar los encabezados para hacer el llamado al servicio 
+	private headers = new HttpHeaders( {
+		'Content-type': 'application/json'
+	  });
+	
+2. Crearl el metodo
+	create(cliente: Cliente): Observable<Cliente>{
+		return this.http.post<Cliente>(this.urlEndPoint, cliente, {headers: this.headers} );
+	  }
+	  
+3. Se injecta en el constructor de la clase form.component el servicio para poder llamar al metodo
+	constructor(private clienteService: ClienteService, private router: Router) { }
+	
+	adicional se injecta el objeto de las rutas para que cuando haga la adición del objeto retorne a la pagina de la lista de clientes
+	
+4. en el form.component se llama al servicio y se redirecciona a la lista de clientes
+	create(): void{
+		this.clienteService.create(this.cliente).subscribe(
+		  response => this.router.navigate(['/clientes'])
+		);
+	  }
+	  
+SE ADICIONA LA LINRERIA SWEET ALERT PARA MEJORAR LOS MENSAJES
+
+1. Se instala de manera local al proyecto
+	npm install sweetalert2
+	
+2.  se importa en el form.component
+	import Swal from 'sweetalert2';
+	
+3. y se adiciona el msg de guardado con exito en el metodo form.component
+	 create(): void{
+    this.clienteService.create(this.cliente).subscribe(
+      cliente => {
+        this.router.navigate(['/clientes'])
+        Swal.fire('Nuevo cliente', `Cliente ${cliente.nombre} creado con exito`, 'success')
+      }
+    );
+  }
+ 
+EDICIÓN DE DATOS
+1.  Generar la url de consulta del cliente
+	 private urlGetCliente = "/editarCliente"
+
+2. SE genera un metodo de consulta del cliente con el id del cliente
+	getCliente(id: number): Observable<Cliente>{
+		return this.http.get<Cliente>(this.host + this.urlGetCliente + "/" + id );
+	  }
+
+3. se debe importat ActivatedRute en el formComponente para poder obtener el valor de los parametros
+	import { Router, ActivatedRoute } from '@angular/router';
+	
+4. Se debe injectar en el constructor del form.component
+	constructor(
+		  private clienteService: ClienteService,
+		  private router: Router,
+		  private activatedRoute: ActivatedRoute
+	  ) { }
+	  
+5. Crear un metodo para obtener la información del registro a modificar
+	cargarCliente(): void{
+		this.activatedRoute.params.subscribe( params => {
+		  let id = params['id']
+		  if (id){
+			this.clienteService.getCliente(id).subscribe( (cliente) => this.cliente = cliente)
+		  }
+		});
+	  }
+	  
+	  y llamarlo en el onInit
+	  ngOnInit(): void {
+		this.cargarCliente()
+	  }
+
+6. Agreagar la ruta al proyecto para la edición de la información con el parametro ID
+	{path: 'clientes/form/:id', component: FormComponent},
+	
+7. Adicionar la opción en el listado de clientes para hacer la adición
+	<td>
+      <a name="" id="" class="btn btn-primary" href="#" role="button" [routerLink]="['/clientes/form', cliente.id]">Editar</a>
+    </td>
+	
+8. Creamos un metodo para actualizar el cliente en el clienteService
+	update(cliente: Cliente): Observable<Cliente>{
+		return this.http.put<Cliente>( this.host + this.urlUpdateCliente + "/" + cliente.id, cliente, { headers: this.headers });
+	  }
+	  
+9. en el FormComponent, se crea el metodo update del front para llamar al servicio
+	update(): void{
+		this.clienteService.update(this.cliente)
+		.subscribe( cliente => {
+		  this.router.navigate( ['/clientes'])
+		  Swal.fire("Cliente actualizado", `Cliente ${cliente.nombre} Actualizado con exito`, 'success')
+		});
+	  }
+	  
+10. GEnear el boton de actualizar en el formComponent.html
+	Se quita el submit del fomulario principal para dar la funcionalidad en cada opción del boton
+	
+	<div class="form-group row">
+        <div class="col-sm-6">
+          <button class="btn btn-primary" role="button" (click)="create()" *ngIf="!cliente.id else elseBlock">Crear</button>
+
+          <ng-template #elseBlock>
+            <button type="button" class="btn btn-primary" role="button" (click)="update()">Editar</button>
+          </ng-template>
+        </div>
+      </div>
+	  
+ELIMINACIÓN DE DATOS
+1. Implementar el metodo delete en el clienteService
+	 delete(id: number): Observable<Cliente>{
+		return this.http.delete<Cliente>( `${this.host}/${this.urlEliminarCliente}/${id}`, { headers: this.headers });
+	  }
+	  
+2. En el componente de listado de los clientes vamos a implementar el medodo delete cliente
+	delete(cliente:Cliente): void{
+    Swal.fire({
+		  title: 'Está seguro?',
+		  text: `¿Está seguro que desea eliminar el cliente ${cliente.nombre} ${cliente.apellido}`,
+		  icon: 'warning',
+		  showCancelButton: true,
+		  confirmButtonText: 'Si, eliminar!',
+		  cancelButtonText: 'No, cancelar!',
+		  reverseButtons: true
+		}).then((result) => {
+		  if (result.isConfirmed) {
+			this.clienteService.delete(cliente.id).subscribe(
+			  response => {
+				this.clientes = this.clientes.filter(cli => cli !== cliente )
+				Swal.fire(
+				  'Cliente eliminado!',
+				  `Cliente ${cliente.nombre} ${cliente.apellido} ha sido  eliminado con éxito`,
+				  'success'
+				)
+			  }
+			)
+
+		  }
+		})
+	  }
+	  
+	  
+3. Creamos el boton de eliminar en el listado de cientes
+	<td>
+		<a name="" id="" class="btn btn-danger" role="button" (click)="delete(cliente)">Eliminar</a>
+	</td>
+	
+MANEJO DE ERRORES EN ANGULAR
+1. importar en ClienteService el catchError de la libreria rxjs
+	import { map, catchError } from 'rxjs';
+	
+2. para interceptar los errores que se tengan de los servicios, utilizamos el metodo pipe
+	getCliente(id: number): Observable<Cliente>{
+    return this.http.get<Cliente>(this.host + this.urlGetCliente + "/" + id ).pipe(
+      catchError(
+        e => {
+          this.router.navigate(['/clientes']);
+          console.log(e.mensaje);
+          Swal.fire(e.error.mensaje, e.error.error, 'error');
+          return throwError(() => e);
+      })
+    );
+  }
+  
+3. Para hacer la redireccion al listado de clientes se injecta en el constructor
+	constructor(private http: HttpClient, private router:Router) { }
+	
+
+CONTROLANDO ERRORES DEL PROTOCOLO HTTP EN EL FORM-COMPONENT CUANDO HACEMOS LLAMADO A LOS SERVICIOS
+1. En el subscribe de los llamados al servicio manejar el error de la siguiente manera
+	cargarCliente(): void{
+		this.activatedRoute.params.subscribe( params => {
+		  let id = params['id']
+		  if (id){
+			this.clienteService.getCliente(id).subscribe( (cliente) => this.cliente = cliente)
+		  }
+		},
+		err => {
+		  this.errores = err.error.error as String[];
+		  console.error(err.status)
+		  console.log(err.error.errors)
+		});
+	  }
+
+VALIDACIONES EN EL FORM TEMPLATE
+1. Se colocan las posibles validaciones en el ClientesComponent.html de la siguiente manera
+
+	--- Validando el nombre del cliente
+	<div class="col-sm-6">
+          <input type="text" class="form-control" [(ngModel)] = "cliente.nombre" name="nombre" minlength="4" #nombre = "ngModel" required>
+          <div class="alert alert-danger" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">
+            <div *ngIf="nombre.errors.required">
+              Nombre es requerido
+            </div>
+            <div *ngIf="nombre.errors.minlength">
+              El nombre debe tener al menos 4 caracteres
+            </div>
+          </div>
+        </div>
+		
+	--Validando el email del cliente
+	<input type="text" class="form-control" [(ngModel)]="cliente.email" name="email" #email="ngModel" email required>
+		<div class="alert alert-danger" *ngIf="email.invalid && (email.dirty || email.touched)">
+			<div *ngIf="email.errors.required">
+			Email es requerido
+			</div>
+			<div *ngIf="email.errors.email">
+			Validar el formato de correo electronico
+			</div>
+		</div>
+
+2. Validar que el formulario no tenga errores para activar o desactivar el boton de crear
+
+2.1 colocar en la etiqueta form un objeto ngForm que permite conocer si el formulario es valido o no
+	<form #clienteForm="ngForm">
+	
+2.2 en el boton validamos el formulario se adiciona la propidad disable entre corchetes para que angular lo valide
+	 <button class="btn btn-primary" role="button" (click)="create()" *ngIf="!cliente.id else elseBlock" [disabled]="!ClienteForm.form.valid">Crear</button>
+
+
+****** USO DE FORMATOS EN LOS DATOS
+
+** USANDO MAP
+	getClientes() : Observable<Cliente[]>{
+    return this.http.get(this.host + this.urlListaClientes).pipe(
+      //map( response => response as Cliente[])
+      map( response => {
+          let clientes = response as Cliente[]
+
+          return clientes.map(cliente => {
+            cliente.nombre = cliente.nombre.toUpperCase();
+            return cliente;
+          });
+        }
+      )
+    );
+  }
+  
+	Formateando la fecha
+	getClientes() : Observable<Cliente[]>{
+    return this.http.get(this.host + this.urlListaClientes).pipe(
+      //map( response => response as Cliente[])
+      map( response => {
+          let clientes = response as Cliente[]
+
+          return clientes.map(cliente => {
+            cliente.nombre = cliente.nombre.toUpperCase();
+            cliente.createAt = formatDate(cliente.createAt, "dd-MM-yyyy", "en-US");
+            return cliente;
+          });
+        }
+      )
+    );
+	
+	
+	FORMATEANDO UTILIZANDO LA CLASE PIPE
+	getClientes() : Observable<Cliente[]>{
+		return this.http.get(this.host + this.urlListaClientes).pipe(
+		  //map( response => response as Cliente[])
+		  map( response => {
+			  let clientes = response as Cliente[]
+
+			  return clientes.map(cliente => {
+				cliente.nombre = cliente.nombre.toUpperCase();
+				//cliente.createAt = formatDate(cliente.createAt, "dd-MM-yyyy", "en-US");
+
+				//Formeteando usando la clase PIPE
+				let datePipe = new DatePipe('en-US');
+				cliente.createAt = datePipe.transform(cliente.createAt, "dd-MM-yyyy" )
+				return cliente;
+
+			  });
+			}
+		  )
+		);
+	  }
+	  
+	PERSONALIZANDO LA FECHA PARA MOSTRAR LOS NOMBRES DE LA FEHA
+	cliente.createAt = datePipe.transform(cliente.createAt, "EEE dd, MMM  yyyy" )
+	
+****** REGISTRANDO LA LOCALIZACIÓN REGIONAL	
+===> importar el lenguaje con el que se va a trabajar
+
+	import localeEs  from '@angular/common/locales/es';
+	
+	
+==> llamar a la función registerLocalData(localES, 'es-ES')
+	//Utilizando la localización de una región
+    let datePipe = new DatePipe('es');
+    registerLocaleData(localeEs, 'es');
+    cliente.createAt = datePipe.transform(cliente.createAt, "EEEE dd, MMMM/yyyy" )
+    return cliente;
+	
+==>	Se puede configurar de manera global para el proyecto en el appModule
+	Importar
+		import { registerLocaleData } from '@angular/common';
+		import localeEs  from '@angular/common/locales/es';	
+	
+	declarar la función registerLocaleData(localeEs, 'es');
+	import { registerLocaleData } from '@angular/common';
+	import localeEs  from '@angular/common/locales/es';
+
+	registerLocaleData(localeEs, 'es');
+	 
+
+******* CAMBIANDO LOS DATOS UTIZANDO PIPES EN LA VISA
+	En el la pagina del listado de clientes se puede colcar en el campo apellido el pipe
+	
+	<td>{{ cliente.id }}</td>
+	<td>{{ cliente.nombre }}</td>
+	<td>{{ cliente.apellido | uppercase }}</td>
+	<td>{{ cliente.email }}</td>
+	<td>{{ cliente.createAt }}</td>
+	<td>
+	
+	Para que el tema de la localización Regional funcione en la vista, se debe editar la vartiable local_id de la aplicación
+	en los providers de la aplicación realizando la siguiente configuración
+	providers: [
+		ClienteService,
+		{provide: LOCALE_ID, useValue: 'es' }
+	]
+
+*** IMPLEMENTANDO FORMULARIOS REACTIVOS
+	
+	** Importar  ReactiveFormsModule en el "appModule"
+	import { ReactiveFormsModule } from '@angular/forms';
+	
+	**inyectar en los modulos del proyecto
+	imports: [
+		BrowserModule,
+		APP_ROUTING,
+		HttpClientModule,
+		FormsModule,
+		ReactiveFormsModule,
+	  ],
+
+	** En el componente Formulario TypeScript se debe importar FormControl y FormGroup
+	import { FormControl, FormGroup } from '@angular/forms';
+	
+	** Crear un metodo que permita crear un grupo de formulario con el objeto FormGroup en el FormComponent.ts
+	crearFormulario() {
+		return new FormGroup({
+		  nombre: new FormControl(''),
+		  apellido: new FormControl(''),
+		  email: new FormControl(''),
+		});
+	  }
+	  
+	** crear un atributo de clase del tipo Form
+	clienteForm: FormGroup;
+	
+	**iniciarlizar el atributo clienteForm en el constructor del componente por medio del metodo crearFormulario()
+	constructor(private clienteService: ClienteService) {
+		this.clienteForm = this.crearFormulario();
+	}
+	
+	** En la etiqueta Form del formulario HTML, hacer el binding con la variable del formulario del form.component.ts
+	<form [formGroup]="clienteForm">
+	
+	
+	** en el componente HTML del formulario, se debe adicionar la propiedad formControl con el nombre de cada uno de los atributos que va a tener el formulario
+	segun la clase definida para ello
+	
+	<input
+      class="form-control form-control-lg"
+      type="text"
+      formControlName="nombre"
+      placeholder="Nombre"
+    />
+	
+	** En el componente form.component.ts en el metodo de guardar (crear) se captura la información del cliente que se tiene en la variable de clase clienteForm
+	crearCliente() {
+		console.log(this.clienteForm.value);
+		this.clienteService
+		  .crearCliente(this.clienteForm.value)
+		  .subscribe((cliente) => {
+			this.router.navigate(['/clientes']);
+			Swal.fire('Cliente Creado', `Cliente: ${cliente.id}`, 'success');
+		  });
+	  }
+	
+	
+	** Validacion de campos de ReactiveForm
+	en cada campo del fomulario adicionar un objeto con cada una de las validaciones x C/Campo del formulario con ayuda del Validators
+	crearFormulario() {
+		return new FormGroup({
+		  nombre: new FormControl('', [
+			Validators.required,
+			Validators.minLength(2),
+		  ]),
+		  apellido: new FormControl('', [
+			Validators.required,
+			Validators.minLength(2),
+		  ]),
+		  email: new FormControl('', [
+			Validators.required,
+			Validators.minLength(2),
+			Validators.email,
+		  ]),
+		});
+	}
+	
+	** Adicionar en el metodo crear del component.ts un condicional para verificar que el fomulario es valido en su estado
+	crearCliente() {
+		if (this.clienteForm.valid) {
+		  console.log(this.clienteForm.value);
+		  this.clienteService
+			.crearCliente(this.clienteForm.value)
+			.subscribe((cliente) => {
+			  this.router.navigate(['/clientes']);
+			  Swal.fire('Cliente Creado', `Cliente: ${cliente.id}`, 'success');
+			});
+		} else {
+		  Swal.fire('Error', 'Verificar la información del Formulario', 'error');
+		}
+	}
+	
+	**Validar cada uno de los campos en el formulario HTML
+	<div
+      class="alert alert-danger"
+      *ngIf="
+        !clienteForm.get('nombre').valid &&
+        (clienteForm.get('nombre').dirty || clienteForm.get('nombre').touched)
+      "
+    >
+      <div *ngIf="clienteForm.get('nombre').errors.required">
+        El nombre es requerido
+      </div>
+      <div *ngIf="clienteForm.get('nombre').errors.minlength">
+        El nombre debe tener mas de 2 letras
+      </div>
+    </div>
+	
+	
+	
